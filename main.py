@@ -1,6 +1,6 @@
 from window import Window
-from maze import Maze
+from game import Difficulty, Game
 
-win = Window(800, 600)
-g = Game(10, 10, 15, 15, 20, 20, win)
+win = Window(500, 500)
+g = Game(Difficulty.BEGINNER, win)
 win.wait_for_close()

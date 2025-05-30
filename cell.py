@@ -1,14 +1,10 @@
 import tkinter as tk
-import pathlib, os
-
-flag = "images/Minesweeper_Flag.png"
-current_dir = pathlib.Path(__file__).parent.resolve()
-img_path = os.path.join(current_dir, flag)
 
 class Cell:
-	def __init__(self, width, height):
+	def __init__(self, width, height, is_mine):
 		self.flag = tk.PhotoImage(file='images/Minesweeper_Flag.png')
-		self._is_mine = False
+		self.mine = tk.PhotoImage(file='images/Minesweeper_Mine.png')
+		self._is_mine = is_mine
 		self._flagged = False
 		self._num_neighboring_mines = 0
 		self._text = ""
@@ -28,6 +24,9 @@ class Cell:
 
 	def _open(self, event):
 		if self._button['state'] == tk.NORMAL:
+			if self._is_mine:
+				self._button.config(image=self.mine)
+				print("GAME OVER")
 			self._button['state'] = tk.DISABLED
 
 	def _flag(self, event):

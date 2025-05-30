@@ -25,14 +25,25 @@ class Game:
 	    	self.num_mines = 99
 	    else:
 	    	raise Exception(f"Invalid Difficulty level: {self._difficulty}")
+	    self._identify_mines()
 	    self._create_cells()
+
+	def _identify_mines(self):
+		self.mines = set()
+		while len(self.mines) < self.num_mines:
+			row = random.randint(0, self.num_rows)
+			column = random.randint(0, self.num_cols)
+			mine_coordinates = (row, column)
+			self.mines.add(mine_coordinates)
+		print(self.mines)
 
 	def _create_cells(self):
 	    self._cells = []
 	    for i in range(self.num_rows):
 	        row = []
 	        for j in range(self.num_cols):
-	            cell = Cell(2, 2)
+	            is_mine = (i, j) in self.mines
+	            cell = Cell(2, 2, is_mine)
 	            row.append(cell)
 	        self._cells.append(row)
 	        

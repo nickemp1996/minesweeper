@@ -107,6 +107,7 @@ class Game:
 		for neighbor in my_neighbors:
 			i = cell._row + neighbor[0]
 			j = cell._col + neighbor[1]
+			cell._neighbors.append(self._cells[i][j])
 			if self._cells[i][j]._is_mine:
 				cell._num_neighboring_mines += 1
 

@@ -47,12 +47,66 @@ class Game:
 	            row.append(cell)
 	        self._cells.append(row)
 	        
-	    # Now that all cells exist in the structure, draw them
+	    # Now that all cells exist in the structure, create buttons and discover neighbors that are mines
 	    for i in range(self.num_rows):
 	        for j in range(self.num_cols):
 	            self._cells[i][j]._create_button(i, j, self._win)
-	            self._animate()
+	            self._identify_neighboring_mines(self._cells[i][j])
 
-	def _animate(self):
-		self._win.redraw()
-		time.sleep(0.05)
+	def _identify_neighboring_mines(self, cell):
+		if cell._is_mine:
+			#this cell is a mine, no need to count neighboring mines
+			return
+		neighbors = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+		#Top row edge cases
+		if cell._row == 0:
+			if cell._col == 0:
+				#cell is at the top left
+				#valid neighbors: east, southeast, south
+				my_neighbors = neighbors[2:5]
+			elif cell._col == self.num_cols - 1:
+				#cell is at the top right
+				#valid neighbors: south, southwest, west
+				my_neighbors = neighbors[4:7]
+			else:
+				#cell between top-left and top-right
+				#valid neighbors: east, southeast, south, southwest, west
+				my_neighbors = neighbors[2:7]
+		#Bottom row edge cases
+		elif cell._row == self.num_rows - 1:
+			if cell._col == 0:
+				#cell is at the bottom left
+				#valid neighbors: north, northeast, east
+				my_neighbors = neighbors[0:3]
+			elif cell._col == self.num_cols - 1:
+				#cell is at the bottom right
+				#valid neighbors: north, west, northwest
+				my_neighbors = [neighbors[0]] + neighbors[6:]
+			else:
+				#cell is between bottom-left and bottom-right
+				#valid neighbors: north, northeast, east, west, northwest
+				my_neighbors = neighbors[0:3] + neighbors[6:]
+		#Left column edge cases
+		elif cell._col == 0:
+			#already handled top-left and bottom-left
+			if cell._row > 0 and cell._row < self.num_rows - 1:
+				#cell is between the top-left and bottom-left
+				#valid neighbors: north, northeast, east, southeast, south
+				my_neighbors = neighbors[0:5]
+		#Right column edge cases
+		elif cell._col == self.num_cols - 1:
+			#already handled top-right and bottom-right
+			if cell._row > 0 and cell._row < self.num_rows - 1:
+				#cell is between top-right and bottom-right
+				#valid neighbors: north, south, southwest, west, northwest
+				my_neighbors = [neighbors[0]] + neighbors[4:]
+		#all edge cases handled, remaining cells are inner cells with 8 neighbors
+		else:
+			my_neighbors = neighbors
+
+		for neighbor in my_neighbors:
+			i = cell._row + neighbor[0]
+			j = cell._col + neighbor[1]
+			if self._cells[i][j]._is_mine:
+				cell._num_neighboring_mines += 1
+

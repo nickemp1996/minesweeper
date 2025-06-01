@@ -1,23 +1,26 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 
 class Cell:
-	def __init__(self, width, height, is_mine):
+	def __init__(self, width, height, is_mine, game):
+		self.i = tk.PhotoImage(width=1, height=1)
 		self.flag = tk.PhotoImage(file='images/Minesweeper_Flag.png')
 		self.mine = tk.PhotoImage(file='images/Minesweeper_Mine.png')
 		self._is_mine = is_mine
 		self._flagged = False
 		self._num_neighboring_mines = 0
 		self._neighbors = []
-		self._text = ""
 		self._width = width
 		self._height = height
 		self._button = None
+		self._game = game
 
 	def _create_button(self, row, col, win):
 		self._row = row
 		self._col = col
-		self._button = tk.Button(win._root, 
-								text = self._text,
+		self._button = tk.Button(win._root,
+								image = self.i,
+								compound = 'c',
 								width = self._width,
 								height = self._height,
 								)
@@ -29,7 +32,25 @@ class Cell:
 		if self._button['state'] == tk.NORMAL:
 			if self._is_mine:
 				self._button.config(image=self.mine)
+				self._button.config(fg="red")
+				self._game._uncover_mines()
 				print("GAME OVER")
+			else:
+				if self._flagged:
+					self._button.config(image="")
+					self._button.image = None
+					self._flagged = False
+				if self._num_neighboring_mines > 0:
+					self._button.config(text=f"{self._num_neighboring_mines}")
+				else:
+					self._open_neighbors()
+			self._button['state'] = tk.DISABLED
+
+	def _non_event_open(self):
+		if self._button['state'] == tk.NORMAL:
+			if self._is_mine and not self._flagged:
+				self._button.config(image=self.mine)
+				self._button.config(fg="red")
 			else:
 				if self._flagged:
 					self._button.config(image="")

@@ -31,8 +31,8 @@ class Game:
 	def _identify_mines(self):
 		self.mines = set()
 		while len(self.mines) < self.num_mines:
-			row = random.randint(0, self.num_rows)
-			column = random.randint(0, self.num_cols)
+			row = random.randint(0, self.num_rows - 1)
+			column = random.randint(0, self.num_cols - 1)
 			mine_coordinates = (row, column)
 			self.mines.add(mine_coordinates)
 		print(self.mines)
@@ -43,7 +43,7 @@ class Game:
 	        row = []
 	        for j in range(self.num_cols):
 	            is_mine = (i, j) in self.mines
-	            cell = Cell(2, 2, is_mine)
+	            cell = Cell(25, 25, is_mine, self)
 	            row.append(cell)
 	        self._cells.append(row)
 	        
@@ -110,4 +110,10 @@ class Game:
 			cell._neighbors.append(self._cells[i][j])
 			if self._cells[i][j]._is_mine:
 				cell._num_neighboring_mines += 1
+
+	def _uncover_mines(self):
+		for mine in self.mines:
+			i = mine[0]
+			j = mine[1]
+			self._cells[i][j]._non_event_open()
 

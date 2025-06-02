@@ -1,6 +1,5 @@
 import time
 import random
-import sys
 from cell import Cell
 from my_enums import Difficulty
 
@@ -8,7 +7,8 @@ class Game:
 	def __init__(self, difficulty, win, seed=None):
 	    self._difficulty = difficulty
 	    self._win = win
-	    self._sys = sys.platform
+	    self.num_cells_open = 0
+	    self.num_cells_flagged = 0
 	    if seed:
 	    	random.seed(seed)
 	    if self._difficulty == Difficulty.BEGINNER:
@@ -35,6 +35,7 @@ class Game:
 			column = random.randint(0, self.num_cols - 1)
 			mine_coordinates = (row, column)
 			self.mines.add(mine_coordinates)
+		print(self.mines)
 
 	def _create_cells(self):
 	    self._cells = []
@@ -126,7 +127,24 @@ class Game:
 		else:
 			self._win.close()
 
+	def check_for_win(self):
+		if self.num_cells_open == (self.num_rows * self.num_cols) - self.num_mines:
+			self.you_won()
+
+	def you_won(self):
+		self._win.open_gif('images/you-win-winner.gif')
+		try_again = self._win.restart_or_quit()
+		if try_again:
+			difficulty = self._win.choose_difficulty()
+			self.change_difficulty(difficulty)
+			self._identify_mines()
+			self._create_cells()
+		else:
+			self._win.close()
+
 	def change_difficulty(self, difficulty):
+		self.num_cells_open = 0
+		self.num_cells_flagged = 0
 		self._difficulty = difficulty
 		if self._difficulty == Difficulty.BEGINNER:
 			self.num_rows = 9

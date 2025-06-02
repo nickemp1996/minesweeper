@@ -31,21 +31,25 @@ class Cell:
 
 	def _open(self, event):
 		if self._button['state'] == tk.NORMAL:
+			self._button['state'] = tk.DISABLED
 			if self._is_mine:
 				self._button.config(image=self.mine)
 				self._game._uncover_mines()
 				self._game.you_lost_haha()
 			else:
+				self._game.num_cells_open += 1
 				if self._flagged:
 					self._button.config(image="")
 					self._flagged = False
+					self._game.num_cells_flagged -= 1
 				if self._num_neighboring_mines > 0:
 					color = self._colors[self._num_neighboring_mines]
 					self._button.config(text=f"{self._num_neighboring_mines}")
 					self._button.config(highlightbackground=color)
 				else:
 					self._open_neighbors()
-			self._button['state'] = tk.DISABLED
+			print(self._game.num_cells_open)
+			self._game.check_for_win()
 
 	def _non_event_open(self):
 		if self._button['state'] == tk.NORMAL:
@@ -58,9 +62,11 @@ class Cell:
 			if self._flagged:
 				self._button.config(image=self.i)
 				self._flagged = False
+				self._game.num_cells_flagged -= 1
 			else:
 				self._button.config(image=self.flag)
 				self._flagged = True
+				self._game.num_cells_flagged += 1
 
 	def _open_neighbors(self):
 		for neighbor in self._neighbors:
@@ -74,6 +80,7 @@ class Cell:
 		if neighbor._button['state'] == tk.DISABLED:
 			return
 		else:
+			self._game.num_cells_open += 1
 			if neighbor._num_neighboring_mines > 0:
 				color = neighbor._colors[neighbor._num_neighboring_mines]
 				neighbor._button.config(relief=tk.SUNKEN)

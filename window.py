@@ -1,4 +1,6 @@
-from tkinter import Tk, Toplevel, Button
+import time
+from tkinter import Tk, Toplevel, Button, Label
+from PIL import Image, ImageTk
 from my_enums import Difficulty
 
 class Window:
@@ -33,7 +35,7 @@ class Window:
 
 	def restart_or_quit(self):
 	    popup = Toplevel(self._root)
-	    popup.title("Try Again?")
+	    popup.title("Play Again?")
 	    result = None
 
 	    def set_result(value):
@@ -41,7 +43,7 @@ class Window:
 	        result = value
 	        popup.destroy()
 
-	    button_1 = Button(popup, text="Try Again?", command=lambda: set_result(True))
+	    button_1 = Button(popup, text="Play Again?", command=lambda: set_result(True))
 	    button_1.pack(pady=10)
 	    button_2 = Button(popup, text="Quit", command=lambda: set_result(False))
 	    button_2.pack(pady=10)
@@ -50,6 +52,34 @@ class Window:
 	    button_1.destroy()
 	    button_2.destroy()
 	    return result
+
+	def play_gif(self, frames, delay):
+	    popup = Toplevel(self._root)
+	    label = Label(popup)
+	    label.pack()
+	    def update(index):
+	        if index >= len(frames):
+	            index = 0
+	        label.config(image=frames[index])
+	        label.after(delay, update, index + 1)
+	    update(0)
+
+	def open_gif(self, file_path):
+	    try:
+	        gif = Image.open(file_path)
+	        frames = []
+	        try:
+	            for i in range(gif.n_frames):
+	                gif.seek(i)
+	                frame = gif.copy()
+	                frame = ImageTk.PhotoImage(frame)
+	                frames.append(frame)
+	        except EOFError:
+	            pass
+	        delay = gif.info.get("duration", 100)
+	        self.play_gif(frames, delay)
+	    except Exception as e:
+	        print(f"Error loading GIF: {e}")
 
 	def redraw(self):
 		self._root.update_idletasks()

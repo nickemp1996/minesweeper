@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import Image, ImageTk
+from tkmacosx import Button
 
 class Cell:
 	def __init__(self, width, height, is_mine, game):
@@ -14,6 +14,7 @@ class Cell:
 		self._height = height
 		self._button = None
 		self._game = game
+		self._colors = ["white", "blue", "green", "red", "purple4", "maroon", "cyan", "purple", "gray"]
 
 	def _create_button(self, row, col, win):
 		self._row = row
@@ -32,16 +33,16 @@ class Cell:
 		if self._button['state'] == tk.NORMAL:
 			if self._is_mine:
 				self._button.config(image=self.mine)
-				self._button.config(fg="red")
 				self._game._uncover_mines()
-				print("GAME OVER")
+				self._game.you_lost_haha()
 			else:
 				if self._flagged:
 					self._button.config(image="")
-					self._button.image = None
 					self._flagged = False
 				if self._num_neighboring_mines > 0:
+					color = self._colors[self._num_neighboring_mines]
 					self._button.config(text=f"{self._num_neighboring_mines}")
+					self._button.config(highlightbackground=color)
 				else:
 					self._open_neighbors()
 			self._button['state'] = tk.DISABLED
@@ -50,23 +51,12 @@ class Cell:
 		if self._button['state'] == tk.NORMAL:
 			if self._is_mine and not self._flagged:
 				self._button.config(image=self.mine)
-				self._button.config(fg="red")
-			else:
-				if self._flagged:
-					self._button.config(image="")
-					self._button.image = None
-					self._flagged = False
-				if self._num_neighboring_mines > 0:
-					self._button.config(text=f"{self._num_neighboring_mines}")
-				else:
-					self._open_neighbors()
-			self._button['state'] = tk.DISABLED
+				self._button['state'] = tk.DISABLED
 
 	def _flag(self, event):
 		if self._button['state'] == tk.NORMAL:
 			if self._flagged:
-				self._button.config(image="")
-				self._button.image = None
+				self._button.config(image=self.i)
 				self._flagged = False
 			else:
 				self._button.config(image=self.flag)
@@ -85,8 +75,10 @@ class Cell:
 			return
 		else:
 			if neighbor._num_neighboring_mines > 0:
+				color = neighbor._colors[neighbor._num_neighboring_mines]
 				neighbor._button.config(relief=tk.SUNKEN)
 				neighbor._button.config(text=f"{neighbor._num_neighboring_mines}")
+				neighbor._button.config(highlightbackground=color)
 				neighbor._button['state'] = tk.DISABLED
 				return
 			else:

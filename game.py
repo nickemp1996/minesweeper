@@ -1,14 +1,14 @@
 import time
 import random
+import sys
 from cell import Cell
-from enum import Enum
-
-Difficulty = Enum('Difficulty', ['BEGINNER', 'INTERMEDIATE', 'EXPERT'])
+from my_enums import Difficulty
 
 class Game:
 	def __init__(self, difficulty, win, seed=None):
 	    self._difficulty = difficulty
 	    self._win = win
+	    self._sys = sys.platform
 	    if seed:
 	    	random.seed(seed)
 	    if self._difficulty == Difficulty.BEGINNER:
@@ -20,8 +20,8 @@ class Game:
 	    	self.num_cols = 16
 	    	self.num_mines = 40
 	    elif self._difficulty == Difficulty.EXPERT:
-	    	self.num_rows = 30
-	    	self.num_cols = 16
+	    	self.num_rows = 16
+	    	self.num_cols = 30
 	    	self.num_mines = 99
 	    else:
 	    	raise Exception(f"Invalid Difficulty level: {self._difficulty}")
@@ -35,7 +35,6 @@ class Game:
 			column = random.randint(0, self.num_cols - 1)
 			mine_coordinates = (row, column)
 			self.mines.add(mine_coordinates)
-		print(self.mines)
 
 	def _create_cells(self):
 	    self._cells = []
@@ -50,8 +49,8 @@ class Game:
 	    # Now that all cells exist in the structure, create buttons and discover neighbors that are mines
 	    for i in range(self.num_rows):
 	        for j in range(self.num_cols):
-	            self._cells[i][j]._create_button(i, j, self._win)
-	            self._identify_neighboring_mines(self._cells[i][j])
+	        	self._cells[i][j]._create_button(i, j, self._win)
+	        	self._identify_neighboring_mines(self._cells[i][j])
 
 	def _identify_neighboring_mines(self, cell):
 		if cell._is_mine:
@@ -116,4 +115,31 @@ class Game:
 			i = mine[0]
 			j = mine[1]
 			self._cells[i][j]._non_event_open()
+
+	def you_lost_haha(self):
+		try_again = self._win.restart_or_quit()
+		if try_again:
+			difficulty = self._win.choose_difficulty()
+			self.change_difficulty(difficulty)
+			self._identify_mines()
+			self._create_cells()
+		else:
+			self._win.close()
+
+	def change_difficulty(self, difficulty):
+		self._difficulty = difficulty
+		if self._difficulty == Difficulty.BEGINNER:
+			self.num_rows = 9
+			self.num_cols = 9
+			self.num_mines = 10
+		elif self._difficulty == Difficulty.INTERMEDIATE:
+			self.num_rows = 16
+			self.num_cols = 16
+			self.num_mines = 40
+		elif self._difficulty == Difficulty.EXPERT:
+			self.num_rows = 16
+			self.num_cols = 30
+			self.num_mines = 99
+		else:
+			raise Exception(f"Invalid Difficulty level: {self._difficulty}")
 

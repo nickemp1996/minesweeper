@@ -63,6 +63,22 @@ class Window:
 	        label.config(image=frames[index])
 	        label.after(delay, update, index + 1)
 	    update(0)
+	    result = None
+
+	    def set_result(value):
+	        nonlocal result
+	        result = value
+	        popup.destroy()
+
+	    button_1 = Button(popup, text="Play Again?", command=lambda: set_result(True))
+	    button_1.pack(pady=10)
+	    button_2 = Button(popup, text="Quit", command=lambda: set_result(False))
+	    button_2.pack(pady=10)
+
+	    popup.wait_window()
+	    button_1.destroy()
+	    button_2.destroy()
+	    return result
 
 	def open_gif(self, file_path):
 	    try:
@@ -77,7 +93,7 @@ class Window:
 	        except EOFError:
 	            pass
 	        delay = gif.info.get("duration", 100)
-	        self.play_gif(frames, delay)
+	        return self.play_gif(frames, delay)
 	    except Exception as e:
 	        print(f"Error loading GIF: {e}")
 

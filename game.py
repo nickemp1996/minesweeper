@@ -118,7 +118,7 @@ class Game:
 			self._cells[i][j]._non_event_open()
 
 	def you_lost_haha(self):
-		try_again = self._win.restart_or_quit()
+		try_again = self._win.open_gif('images/nuke.gif')
 		if try_again:
 			difficulty = self._win.choose_difficulty()
 			self.change_difficulty(difficulty)
@@ -132,8 +132,7 @@ class Game:
 			self.you_won()
 
 	def you_won(self):
-		self._win.open_gif('images/you-win-winner.gif')
-		try_again = self._win.restart_or_quit()
+		try_again = self._win.open_gif('images/you-win-winner.gif')
 		if try_again:
 			difficulty = self._win.choose_difficulty()
 			self.change_difficulty(difficulty)

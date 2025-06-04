@@ -26,6 +26,7 @@ class Game:
 	    else:
 	    	raise Exception(f"Invalid Difficulty level: {self._difficulty}")
 	    self._identify_mines()
+	    self._id_rick_roll()
 	    self._create_cells()
 
 	def _identify_mines(self):
@@ -35,7 +36,15 @@ class Game:
 			column = random.randint(0, self.num_cols - 1)
 			mine_coordinates = (row, column)
 			self.mines.add(mine_coordinates)
-		print(self.mines)
+
+	def _id_rick_roll(self):
+		self.rick = None
+		while not self.rick:
+			row = random.randint(0, self.num_rows - 1)
+			column = random.randint(0, self.num_cols - 1)
+			rick_roll_coordinates = (row, column)
+			if rick_roll_coordinates not in self.mines:
+				self.rick = rick_roll_coordinates
 
 	def _create_cells(self):
 	    self._cells = []
@@ -43,7 +52,8 @@ class Game:
 	        row = []
 	        for j in range(self.num_cols):
 	            is_mine = (i, j) in self.mines
-	            cell = Cell(25, 25, is_mine, self)
+	            is_rick_roll = (i, j) == self.rick
+	            cell = Cell(25, 25, is_mine, is_rick_roll, self)
 	            row.append(cell)
 	        self._cells.append(row)
 	        
@@ -118,21 +128,22 @@ class Game:
 			self._cells[i][j]._non_event_open()
 
 	def you_lost_haha(self):
-		try_again = self._win.open_gif('images/nuke.gif')
-		if try_again:
-			difficulty = self._win.choose_difficulty()
-			self.change_difficulty(difficulty)
-			self._identify_mines()
-			self._create_cells()
-		else:
-			self._win.close()
+		try_again = self._win.open_gif('images/nuke.gif', "Loser!")
+		self.try_again_or_quit(try_again)
 
 	def check_for_win(self):
 		if self.num_cells_open == (self.num_rows * self.num_cols) - self.num_mines:
 			self.you_won()
 
 	def you_won(self):
-		try_again = self._win.open_gif('images/you-win-winner.gif')
+		try_again = self._win.open_gif('images/you-win-winner.gif', "You Won!")
+		self.try_again_or_quit(try_again)
+
+	def rick_roll(self):
+		try_again = self._win.open_gif('images/rick.gif', "You got Rick Rolled!")
+		self.try_again_or_quit(try_again)
+
+	def try_again_or_quit(self, try_again):
 		if try_again:
 			difficulty = self._win.choose_difficulty()
 			self.change_difficulty(difficulty)

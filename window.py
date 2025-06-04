@@ -1,5 +1,4 @@
-import time
-from tkinter import Tk, Toplevel, Button, Label
+from tkinter import Tk, Toplevel, Button, Label, Frame
 from PIL import Image, ImageTk
 from my_enums import Difficulty
 
@@ -33,28 +32,9 @@ class Window:
 	    button_3.destroy()
 	    return result
 
-	def restart_or_quit(self):
+	def play_gif(self, frames, delay, title):
 	    popup = Toplevel(self._root)
-	    popup.title("Play Again?")
-	    result = None
-
-	    def set_result(value):
-	        nonlocal result
-	        result = value
-	        popup.destroy()
-
-	    button_1 = Button(popup, text="Play Again?", command=lambda: set_result(True))
-	    button_1.pack(pady=10)
-	    button_2 = Button(popup, text="Quit", command=lambda: set_result(False))
-	    button_2.pack(pady=10)
-
-	    popup.wait_window()
-	    button_1.destroy()
-	    button_2.destroy()
-	    return result
-
-	def play_gif(self, frames, delay):
-	    popup = Toplevel(self._root)
+	    popup.title(title)
 	    label = Label(popup)
 	    label.pack()
 	    def update(index):
@@ -80,7 +60,7 @@ class Window:
 	    button_2.destroy()
 	    return result
 
-	def open_gif(self, file_path):
+	def open_gif(self, file_path, title):
 	    try:
 	        gif = Image.open(file_path)
 	        frames = []
@@ -93,7 +73,7 @@ class Window:
 	        except EOFError:
 	            pass
 	        delay = gif.info.get("duration", 100)
-	        return self.play_gif(frames, delay)
+	        return self.play_gif(frames, delay, title)
 	    except Exception as e:
 	        print(f"Error loading GIF: {e}")
 

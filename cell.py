@@ -1,13 +1,13 @@
 import tkinter as tk
-from tkmacosx import Button
 
 class Cell:
-	def __init__(self, width, height, is_mine, game):
+	def __init__(self, width, height, is_mine, is_rick_roll, game):
 		self.i = tk.PhotoImage(width=1, height=1)
 		self.flag = tk.PhotoImage(file='images/Minesweeper_Flag.png')
 		self.mine = tk.PhotoImage(file='images/Minesweeper_Mine.png')
 		self._is_mine = is_mine
 		self._flagged = False
+		self._is_rick_roll = is_rick_roll
 		self._num_neighboring_mines = 0
 		self._neighbors = []
 		self._width = width
@@ -36,6 +36,8 @@ class Cell:
 				self._button.config(image=self.mine)
 				self._game._uncover_mines()
 				self._game.you_lost_haha()
+			elif self._is_rick_roll:
+				self._game.rick_roll()
 			else:
 				self._game.num_cells_open += 1
 				if self._flagged:
@@ -48,7 +50,6 @@ class Cell:
 					self._button.config(highlightbackground=color)
 				else:
 					self._open_neighbors()
-			print(self._game.num_cells_open)
 			self._game.check_for_win()
 
 	def _non_event_open(self):

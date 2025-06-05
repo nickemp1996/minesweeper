@@ -13,7 +13,7 @@ class Window:
 		self._frame2 = Frame(self._root)
 		self._frame2.pack()
 		self._running = False
-		self._digital_font = tkFont.Font(family="digital_font", size=36)
+		self._digital_font = tkFont.Font(family="DS-Digital", size=36)
 		self.seconds = 0
 		self.rollover = 0
 		self.timer_running = False

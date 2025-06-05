@@ -28,6 +28,7 @@ class Game:
 	    self._identify_mines()
 	    self._id_rick_roll()
 	    self._create_cells()
+	    self.update_flags()
 
 	def _identify_mines(self):
 		self.mines = set()
@@ -128,6 +129,7 @@ class Game:
 			self._cells[i][j]._non_event_open()
 
 	def you_lost_haha(self):
+		self._win.stop_timer()
 		try_again = self._win.open_gif('images/nuke.gif', "Loser!")
 		self.try_again_or_quit(try_again)
 
@@ -136,15 +138,18 @@ class Game:
 			self.you_won()
 
 	def you_won(self):
+		self._win.stop_timer()
 		try_again = self._win.open_gif('images/you-win-winner.gif', "You Won!")
 		self.try_again_or_quit(try_again)
 
 	def rick_roll(self):
+		self._win.stop_timer()
 		try_again = self._win.open_gif('images/rick.gif', "You got Rick Rolled!")
 		self.try_again_or_quit(try_again)
 
 	def try_again_or_quit(self, try_again):
 		if try_again:
+			self._win.reset_timer()
 			difficulty = self._win.choose_difficulty()
 			self.change_difficulty(difficulty)
 			self._identify_mines()
@@ -170,4 +175,13 @@ class Game:
 			self.num_mines = 99
 		else:
 			raise Exception(f"Invalid Difficulty level: {self._difficulty}")
+		self.update_flags()
+
+	def update_flags(self):
+		flags_left = self.num_mines - self.num_cells_flagged
+		self._win.update_flags(flags_left)
+
+	def start_timer(self):
+		self._win.timer_running = True
+		self._win.update_timer()
 

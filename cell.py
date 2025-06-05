@@ -19,7 +19,7 @@ class Cell:
 	def _create_button(self, row, col, win):
 		self._row = row
 		self._col = col
-		self._button = tk.Button(win._root,
+		self._button = tk.Button(win._frame2,
 								image = self.i,
 								compound = 'c',
 								width = self._width,
@@ -30,7 +30,9 @@ class Cell:
 		self._button.bind("<Button-3>", self._flag)
 
 	def _open(self, event):
-		if self._button['state'] == tk.NORMAL:
+		if self._game.num_cells_open == 0 and self._game.num_cells_flagged == 0:
+			self._game.start_timer()
+		if self._button['state'] == tk.NORMAL and not self._flagged:
 			self._button['state'] = tk.DISABLED
 			if self._is_mine:
 				self._button.config(image=self.mine)
@@ -59,15 +61,20 @@ class Cell:
 				self._button['state'] = tk.DISABLED
 
 	def _flag(self, event):
+		if self._game.num_cells_open == 0 and self._game.num_cells_flagged == 0:
+			self._game.start_timer()
 		if self._button['state'] == tk.NORMAL:
 			if self._flagged:
 				self._button.config(image=self.i)
 				self._flagged = False
 				self._game.num_cells_flagged -= 1
+				self._game.update_flags()
 			else:
-				self._button.config(image=self.flag)
-				self._flagged = True
-				self._game.num_cells_flagged += 1
+				if self._game.num_cells_flagged < self._game.num_mines:
+					self._button.config(image=self.flag)
+					self._flagged = True
+					self._game.num_cells_flagged += 1
+					self._game.update_flags()
 
 	def _open_neighbors(self):
 		for neighbor in self._neighbors:
